@@ -1,8 +1,8 @@
-Bestgust API
-============
+Windspotter API
+===============
 
-This is the API for the Bestgust project. It is a FastAPI app that can be hosted
-in AWS Lambda.
+This is the API for the Windspotter project. It is a FastAPI app that can be
+hosted in AWS Lambda.
 
 Development
 -----------
