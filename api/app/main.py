@@ -1,10 +1,7 @@
 from fastapi import FastAPI
 
-from app.config import settings
+from app.core.config import settings
+from app.routers import auth, users
 
 app = FastAPI(title=settings.app_name)
-
-
-@app.get("/")
-def root():
-    return {"message": "API is running"}
+app.include_router(auth.router)
