@@ -3,10 +3,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_prefix="WS_API_", env_file=".env", env_file_encoding="utf-8"
+        env_prefix="WS_", env_file=".env", env_file_encoding="utf-8"
     )
 
-    app_name: str = "Windspotter API"
+    app_name: str = "Windspotter"
 
     auth_secret_key: str
     auth_jwt_algorithm: str = "HS256"
