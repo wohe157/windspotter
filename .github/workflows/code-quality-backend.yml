@@ -1,0 +1,34 @@
+name: Code Quality (backend)
+
+on:
+  push:
+    paths:
+      - "backend/**"
+  pull_request:
+    paths:
+      - "backend/**"
+
+jobs:
+  quality-checks:
+    name: Run formatting and lint checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python environment with uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          python-version: "3.13"
+          cache: true
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: uv sync --dev
+
+      - name: Check Python formatting & import sorting (Ruff)
+        working-directory: backend
+        run: |
+          uv run ruff check . --select I
+          uv run ruff format . --check

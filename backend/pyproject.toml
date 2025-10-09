@@ -15,5 +15,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "ruff~=0.14.0",
     "uvicorn~=0.37.0",
 ]
