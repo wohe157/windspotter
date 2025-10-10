@@ -3,19 +3,15 @@ from typing import Annotated
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
-from pwdlib import PasswordHash
 
 from app.core.config import settings
 from app.core.security import create_token, verify_password, verify_token
 from app.models.auth import AccessToken
 from app.models.common import Message
+from app.repositories.revoked_refresh_tokens import revoke_token, token_is_revoked
 from app.repositories.users import get_user_by_email
 
-# TODO: This is only for testing before setting up an actual db
-revoked_refresh_tokens = set()
-
 router = APIRouter(prefix="/auth")
-hasher = PasswordHash.recommended()
 
 
 @router.post("/login")
@@ -50,15 +46,15 @@ async def login(
 
 
 @router.post("/refresh")
-def refresh(response: Response, refresh_token: str = Cookie(None)):
+async def refresh(response: Response, refresh_token: str = Cookie(None)):
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Missing refresh token")
 
-    if refresh_token in revoked_refresh_tokens:
+    if token_is_revoked(refresh_token):
         raise HTTPException(status_code=401, detail="Refresh token reused")
 
     payload = verify_token(refresh_token, "refresh")
-    revoked_refresh_tokens.add(refresh_token)
+    revoke_token(refresh_token)
 
     new_access = create_token(
         {"sub": payload["sub"]},
@@ -82,6 +78,8 @@ def refresh(response: Response, refresh_token: str = Cookie(None)):
 
 
 @router.post("/logout")
-async def logout(response: Response) -> Message:
+async def logout(response: Response, refresh_token: str = Cookie(None)) -> Message:
+    if refresh_token:
+        revoke_token(refresh_token)
     response.delete_cookie("refresh_token")
     return Message(message="Logged out")

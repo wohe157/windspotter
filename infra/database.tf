@@ -19,3 +19,14 @@ resource "aws_dynamodb_table" "users" {
     projection_type = "ALL"
   }
 }
+
+resource "aws_dynamodb_table" "revoked_refresh_tokens" {
+  name         = "${var.app_name}-${terraform.workspace}-revoked-refresh-tokens"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "token"
+
+  attribute {
+    name = "token"
+    type = "S"
+  }
+}

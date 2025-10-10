@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     dynamodb_users_table: str
     dynamodb_users_index_by_email: str
+    dynamodb_revoked_refresh_tokens: str
 
 
 settings = Settings()
