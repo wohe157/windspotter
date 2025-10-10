@@ -17,4 +17,11 @@ terraform {
 
 provider "aws" {
   region = "eu-west-1"
+
+  default_tags {
+    tags = {
+      app = var.app_name
+      env = terraform.workspace
+    }
+  }
 }

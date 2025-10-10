@@ -6,9 +6,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pwdlib import PasswordHash
 
 from app.core.config import settings
-from app.core.security import create_token, verify_token
+from app.core.security import create_token, verify_password, verify_token
 from app.models.auth import AccessToken
 from app.models.common import Message
+from app.repositories.users import get_user_by_email
 
 # TODO: This is only for testing before setting up an actual db
 revoked_refresh_tokens = set()
@@ -21,17 +22,19 @@ hasher = PasswordHash.recommended()
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], response: Response
 ) -> AccessToken:
-    # TODO: add database and hashing
-    if form_data.username != "admin" or form_data.password != "secret":
+    user_data = get_user_by_email(form_data.username)
+    if user_data is None or not verify_password(
+        form_data.password, user_data.password_hash
+    ):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     access_token = create_token(
-        {"sub": form_data.username},
+        {"sub": user_data.user_id},
         "access",
         dt.timedelta(minutes=settings.auth_access_token_expire_minutes),
     )
     refresh_token = create_token(
-        {"sub": form_data.username},
+        {"sub": user_data.user_id},
         "refresh",
         dt.timedelta(days=settings.auth_refresh_token_expire_days),
     )
