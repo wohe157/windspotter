@@ -16,7 +16,11 @@ class AuthService:
     def authenticate_user(self, email: str, password: str) -> User:
         """Verify the given credentials"""
         user = self.user_repository.get_user_by_email(email)
-        if user is None or not verify_password(password, user.password_hash):
+        if (
+            user is None
+            or not verify_password(password, user.password_hash)
+            or not user.is_active
+        ):
             raise InvalidCredentialsException()
         return user
 

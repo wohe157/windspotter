@@ -1,13 +1,12 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Depends, Response
-from fastapi.security import OAuth2PasswordRequestForm
-
 from app.core.exceptions import InvalidRefreshTokenException
 from app.schemas.auth import AccessToken
 from app.schemas.common import Message
 from app.services.auth_service import AuthService
 from app.services.token_service import TokenService
+from fastapi import APIRouter, Cookie, Depends, Response
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(prefix="/auth")
 

@@ -5,6 +5,7 @@ from app.core.exceptions import (
     InvalidAccessTokenException,
     InvalidCredentialsException,
     InvalidRefreshTokenException,
+    ItemAlreadyExistsException,
     ItemNotFoundException,
 )
 
@@ -35,3 +36,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(ItemNotFoundException)
     async def _(request: Request, exc: ItemNotFoundException) -> JSONResponse:
         return JSONResponse(status_code=404, content={"detail": exc.msg})
+
+    @app.exception_handler(ItemAlreadyExistsException)
+    async def _(request: Request, exc: ItemAlreadyExistsException) -> JSONResponse:
+        return JSONResponse(status_code=409, content={"detail": exc.msg})

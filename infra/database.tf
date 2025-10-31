@@ -1,3 +1,14 @@
+resource "aws_dynamodb_table" "revoked_refresh_tokens" {
+  name         = "${var.app_name}-${terraform.workspace}-revoked-refresh-tokens"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "token"
+
+  attribute {
+    name = "token"
+    type = "S"
+  }
+}
+
 resource "aws_dynamodb_table" "users" {
   name         = "${var.app_name}-${terraform.workspace}-users"
   billing_mode = "PAY_PER_REQUEST"
@@ -18,15 +29,9 @@ resource "aws_dynamodb_table" "users" {
     hash_key        = "email"
     projection_type = "ALL"
   }
-}
 
-resource "aws_dynamodb_table" "revoked_refresh_tokens" {
-  name         = "${var.app_name}-${terraform.workspace}-revoked-refresh-tokens"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "token"
-
-  attribute {
-    name = "token"
-    type = "S"
+  ttl {
+    attribute_name = "expires_at"
+    enabled        = true
   }
 }
