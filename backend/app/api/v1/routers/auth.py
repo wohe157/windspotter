@@ -1,9 +1,9 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Cookie, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.core.exceptions import InvalidCredentialsError
+from app.core.exceptions import InvalidRefreshTokenException
 from app.schemas.auth import AccessToken
 from app.schemas.common import Message
 from app.services.auth_service import AuthService
@@ -23,17 +23,9 @@ async def login(
     expires, a new access token can be requested via `POST /api/v1/auth/refresh` using
     the `refresh_token` cookie.
     """
-    try:
-        access_token, refresh_token = AuthService().login(
-            email=form_data.username, password=form_data.password
-        )
-    except InvalidCredentialsError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid email and/or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
+    access_token, refresh_token = AuthService().login(
+        email=form_data.username, password=form_data.password
+    )
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
@@ -49,16 +41,8 @@ async def refresh(
     response: Response, refresh_token: Annotated[str | None, Cookie()] = None
 ) -> AccessToken:
     if not refresh_token:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing refresh token"
-        )
-    try:
-        new_access_token, new_refresh_token = AuthService().refresh(refresh_token)
-    except InvalidCredentialsError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid refresh token"
-        )
-
+        raise InvalidRefreshTokenException()
+    new_access_token, new_refresh_token = AuthService().refresh(refresh_token)
     response.set_cookie(
         key="refresh_token",
         value=new_refresh_token,

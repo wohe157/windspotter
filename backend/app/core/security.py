@@ -2,7 +2,7 @@ import jwt
 from pwdlib import PasswordHash
 
 from app.core.config import settings
-from app.core.exceptions import InvalidOrExpiredTokenError
+from app.core.exceptions import InvalidAccessTokenException
 
 _password_hasher = PasswordHash.recommended()
 
@@ -27,4 +27,4 @@ def decode_token(token: str) -> dict:
             token, settings.auth_secret_key, algorithms=[settings.auth_jwt_algorithm]
         )
     except jwt.exceptions.PyJWTError as e:
-        raise InvalidOrExpiredTokenError() from e
+        raise InvalidAccessTokenException() from e

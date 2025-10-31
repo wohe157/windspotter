@@ -1,6 +1,16 @@
-class InvalidOrExpiredTokenError(Exception):
-    """Raised when a JWT token is invalid or expired"""
+class InvalidAccessTokenException(Exception):
+    pass
 
 
-class InvalidCredentialsError(Exception):
-    """Raised when email and/or password is incorrect"""
+class InvalidRefreshTokenException(Exception):
+    pass
+
+
+class InvalidCredentialsException(Exception):
+    pass
+
+
+class ItemNotFoundException(Exception):
+    def __init__(self, msg: str):
+        super().__init__(msg)
+        self.msg = msg
