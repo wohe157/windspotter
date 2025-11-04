@@ -21,7 +21,6 @@ provider "aws" {
   default_tags {
     tags = {
       app = var.app_name
-      env = terraform.workspace
     }
   }
 }
